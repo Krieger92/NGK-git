@@ -1,16 +1,16 @@
-Executable = prog
+Executable = server
 targets = all clean help
 CXX = gcc
 
 # wildcard
 SOURCES = server.c iknlib.c
-OBJECTS = $(SOURCES:.cpp=.o)
-DEPS = $(SOURCES:.cpp=.d)
+OBJECTS = $(SOURCES:.c=.o)
+DEPS = $(SOURCES:.c=.d)
 CXXFLAGS = -I.
 
 
 # how to create .o files from cpp
-%.d:%.cpp
+%.d:%.c
 	$(CXX) -MT$@ -MM $(CXXFLAGS) $< > $@
 	$(CXX) -MT$(@:.d=.o) -MM  $(CXXFLAGS) $< >> $@
 
@@ -26,8 +26,8 @@ $(Executable): $(OBJECTS) $(DEPS)
 
 # remove executable
 clean:
-	rm $(Executable) *.o
-	
+	rm $(Executable) *.o *.d
+
 help:
 	@echo "Available targets: $(targets)"
 	@echo "Makefile compiles: $(SOURCE)"

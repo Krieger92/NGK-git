@@ -2,6 +2,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <stdlib.h>
+#include <string.h>
 #include "iknlib.h"
 
 #define SIZE 255
@@ -98,7 +100,7 @@ int main(int argc, char* argv[]) {
         printf("Found client...\n");
 
         /* HØR CLIENT */
-        readTextTCP(newsocketfd,&buffer,sizeof(buffer));    // aflæs besked fra client
+        readTextTCP(newsocketfd,buffer,sizeof(buffer));    // aflæs besked fra client
         const char* fileName = extractFileName(buffer);     // gem navn (e.g. test.png)
         const char* fileDirectory = buffer;                 // gem sti + navn (e.g. Desktop/NGK/test.png)
         long fileSize = getFilesize(fileName);              // check filstørelse
