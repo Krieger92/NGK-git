@@ -1,5 +1,5 @@
 Executable = server
-targets = all clean help
+targets = all clean cleanExe help
 CXX = gcc
 
 # wildcard
@@ -26,7 +26,10 @@ $(Executable): $(OBJECTS) $(DEPS)
 
 # remove executable
 clean:
-	rm $(Executable) *.o *.d
+	rm *.o *.d
+
+cleanExe:
+	rm $(Executable) *.d
 
 help:
 	@echo "Available targets: $(targets)"
