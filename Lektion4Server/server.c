@@ -22,24 +22,32 @@ void error(const char * msg) {
 void sendFile(const int clientSocket, const char* fileName, long fileSize)
 {
     FILE * fp;                      // pointer til fil 
-    size_t numberOfBytes;           // retur parameter for fread (antal bytes læst)
-    uint8_t tempBuffer[1000];       // buffer med plads til 1000 bytes  
+    size_t numberOfBytes;      // retur parameter for fread (antal bytes læst)
+    uint8_t dataBuffer[1000];       // buffer med plads til 1000 bytes  
+    char charBuffer[256];
     long dataToSend = fileSize;     // Antal bytes der mangler at blive sendt
 
 	printf("Sending: %s, size: %li\n", fileName, fileSize);     // opdater terminal
-	
+    
+    snprintf(charBuffer,sizeof(charBuffer),"%li",fileSize);
+    write(clientSocket,charBuffer,sizeof(charBuffer));
+
     fp = fopen(fileName,"rb");      // open fil
 
-    while (dataToSend)
-    {
+    do {
         printf("Data: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
         
-        numberOfBytes = fread(tempBuffer,1,sizeof(tempBuffer),fp);      // aflæs op til 1000 bytes fra fil
-        write(clientSocket,tempBuffer,sizeof(tempBuffer));              // skriv op til 1000 bytes til bruger
+        numberOfBytes = fread(dataBuffer,1,sizeof(dataBuffer),fp);      // aflæs op til 1000 bytes fra fil
+        write(clientSocket,dataBuffer,sizeof(dataBuffer));              // skriv op til 1000 bytes til bruger
         dataToSend -= numberOfBytes;                                    // opdater antal bytes der mangler at blive sendt
 
-    }
-    
+        if(dataToSend < 1000) {
+            numberOfBytes = fread(dataBuffer,1,dataToSend,fp);
+            write(clientSocket,dataBuffer,sizeof(dataBuffer));
+            dataToSend -= numberOfBytes;
+        }
+    } while (numberOfBytes);
+
     fclose(fp);
 	
 }
@@ -105,13 +113,14 @@ int main(int argc, char* argv[]) {
         const char* fileDirectory = buffer;                 // gem sti + navn (e.g. Desktop/NGK/test.png)
         long fileSize = getFilesize(fileName);              // check filstørelse
         if(fileSize < 0) {                                  // error handle
-            n = write(newsocketfd,"Error 404 - file could not be found",36);
+            writeTextTCP(newsocketfd,"Error 404 - file could not be found");
         }
 
         /* SVAR CLIENT*/
         sendFile(newsocketfd,fileName,fileSize);        // Opdater terminal m/ ønsket fil og data sent
 
         close(newsocketfd);
+        printf("File sent! terminating connection with client...\n");
 
     }                       // slut loop
 

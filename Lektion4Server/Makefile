@@ -29,7 +29,7 @@ clean:
 	rm *.o *.d
 
 cleanExe:
-	rm $(Executable) *.d
+	rm $(Executable) *.o *.d
 
 help:
 	@echo "Available targets: $(targets)"
