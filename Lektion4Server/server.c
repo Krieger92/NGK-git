@@ -19,23 +19,23 @@ void error(const char * msg) {
 // @param clientSocket Clientens socket (newsocketfd)
 // @param fileName Navn på filen der ønskes sendt
 // @param fileSize Størelsen på filen der ønskes sendt
-void sendFile(int clientSocket, const char* fileName, long fileSize)
+void sendFile(const int clientSocket, const char* fileName, long fileSize)
 {
     FILE * fp;                      // pointer til fil 
     size_t numberOfBytes;           // retur parameter for fread (antal bytes læst)
     uint8_t tempBuffer[1000];       // buffer med plads til 1000 bytes  
     long dataToSend = fileSize;     // Antal bytes der mangler at blive sendt
 
-	printf("Sending: %s, size: %li\n", fileName, fileSize);   
+	printf("Sending: %s, size: %li\n", fileName, fileSize);     // opdater terminal
 	
     fp = fopen(fileName,"rb");      // open fil
 
     while (dataToSend)
     {
-        printf("data sent: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
+        printf("Data: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
         
-        numberOfBytes = fread(tempBuffer,1,sizeof(tempBuffer),fp);      // aflæs 1000 bytes fra fil
-        write(clientSocket,tempBuffer,sizeof(tempBuffer));              // skriv 1000 bytes til bruger
+        numberOfBytes = fread(tempBuffer,1,sizeof(tempBuffer),fp);      // aflæs op til 1000 bytes fra fil
+        write(clientSocket,tempBuffer,sizeof(tempBuffer));              // skriv op til 1000 bytes til bruger
         dataToSend -= numberOfBytes;                                    // opdater antal bytes der mangler at blive sendt
 
     }
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
     printf("Starting server...\n");
 
     if(argc < 2) {  // Hvis portNumber ikke er givet set til default
-        perror("ERROR - no server port provided");
+        perror("ERROR - no server port provided, default is 9000");
         portno = 9000;
     } else {
         portno = atoi(argv[1]);     // set portno til argument givet til main
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
         printf("Found client...\n");
 
         /* HØR CLIENT */
-        readTextTCP(newsocketfd,buffer,sizeof(buffer));    // aflæs besked fra client
+        readTextTCP(newsocketfd,buffer,sizeof(buffer));     // aflæs besked fra client
         const char* fileName = extractFileName(buffer);     // gem navn (e.g. test.png)
         const char* fileDirectory = buffer;                 // gem sti + navn (e.g. Desktop/NGK/test.png)
         long fileSize = getFilesize(fileName);              // check filstørelse
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
         }
 
         /* SVAR CLIENT*/
-        sendFile(newsocketfd,fileName,fileSize);
+        sendFile(newsocketfd,fileName,fileSize);        // Opdater terminal m/ ønsket fil og data sent
 
         close(newsocketfd);
 
