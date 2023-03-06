@@ -40,11 +40,11 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
 
         if(dataToRead > 1000) {
             numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
+
         }
         else {
             numberOfBytes = read(serverSocket,buffer,dataToRead);
         }
-
 
     }
 
