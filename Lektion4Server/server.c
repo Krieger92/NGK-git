@@ -34,19 +34,20 @@ void sendFile(const int clientSocket, const char* fileName, long fileSize)
 
     fp = fopen(fileName,"rb");      // open fil
 
-    do {
+
+    numberOfBytes = fread(dataBuffer,1,sizeof(dataBuffer),fp);  // start læsning af fil
+
+    while (numberOfBytes) {                                     // imens der stadig er mere at læse
+        bzero(dataBuffer,sizeof(dataBuffer));
         printf("Data: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
         
-        numberOfBytes = fread(dataBuffer,1,sizeof(dataBuffer),fp);      // aflæs op til 1000 bytes fra fil
-        write(clientSocket,dataBuffer,sizeof(dataBuffer));              // skriv op til 1000 bytes til bruger
+        write(clientSocket,dataBuffer,numberOfBytes);                   // skriv op til 1000 bytes til bruger
         dataToSend -= numberOfBytes;                                    // opdater antal bytes der mangler at blive sendt
+        numberOfBytes = fread(dataBuffer,1,sizeof(dataBuffer),fp);      // aflæs op til 1000 bytes fra fil
 
-        if(dataToSend < 1000) {
-            numberOfBytes = fread(dataBuffer,1,dataToSend,fp);
-            write(clientSocket,dataBuffer,sizeof(dataBuffer));
-            dataToSend -= numberOfBytes;
-        }
-    } while (numberOfBytes);
+    } 
+
+    printf("Data: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
 
     fclose(fp);
 	
@@ -118,7 +119,6 @@ int main(int argc, char* argv[]) {
 
         /* SVAR CLIENT*/
         sendFile(newsocketfd,fileName,fileSize);        // Opdater terminal m/ ønsket fil og data sent
-
         close(newsocketfd);
         printf("File sent! terminating connection with client...\n");
 
