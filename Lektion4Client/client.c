@@ -30,25 +30,20 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
 
     fp = fopen(fileName,"wb");
 
-    numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
-
-    while(numberOfBytes) {
+    do {
         printf("Data: %li / %li\n",(fileSize-dataToRead), fileSize);
 
-        fwrite(buffer,1,numberOfBytes,fp);
+        numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
         dataToRead -= numberOfBytes;
+        numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
 
-        if(dataToRead > 1000) {
-            numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
-
+        if(dataToRead < 1000) {
+            numberOfBytes = read(serverSocket,buffer,sizeof(buffer));
+            numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
+            dataToRead -= numberOfBytes;
         }
-        else {
-            numberOfBytes = read(serverSocket,buffer,dataToRead);
-        }
 
-    }
-
-    printf("Data: %li / %li\n",(fileSize-dataToRead), fileSize);
+    } while(numberOfBytes);
 
     fclose(fp);
     
