@@ -36,7 +36,7 @@ void sendFile(const int clientSocket, const char* fileName, long fileSize)
     fp = fopen(fileName,"rb");      // open fil
 
     do 
-    {                                     // imens der stadig er mere at læse
+    {                                                                  // imens der stadig er mere at læse
         bzero(dataBuffer,sizeof(dataBuffer));                        // hvis der er mindre end 1000 bytes tilbage
         numberOfBytes = fread(dataBuffer,1,dataToSend,fp);          // læs resten af filen
         write(clientSocket,dataBuffer,numberOfBytes);                   // skriv op til 1000 bytes til bruger
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     int clilen;         // client addresse
     int n;              // retur parameter for read() og write()
 
-    char buffer[SIZE];  // buffer 
+    uint8_t buffer[SIZE];  // buffer 
 
                                     // struct fra <netinet/in.h>
     struct sockaddr_in serv_addr;   // server adresse/forbindelse info
