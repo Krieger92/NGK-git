@@ -39,8 +39,9 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
         if(dataToRead < 1000) {
             numberOfBytes = read(serverSocket,buffer,sizeof(buffer));
             numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
-            printf("Debug data print: %s \n", buffer);
+            printf("Debug data print small file: %s \n", buffer);
             printf("Data to read: %i\n" , dataToRead);
+            printf("Data to read: %i\n" , numberOfBytes);
             dataToRead -= numberOfBytes;
         }
         else
@@ -49,6 +50,7 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
             numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
             printf("Debug data print: %s \n", buffer);
             printf("Data to read: %i\n" , dataToRead);
+            printf("Data to read: %i\n" , numberOfBytes);
             dataToRead -= numberOfBytes;
         }
 
