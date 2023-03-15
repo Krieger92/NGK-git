@@ -35,6 +35,7 @@ void sendFile(const int clientSocket, const char* fileName, long fileSize)
 
     fp = fopen(fileName,"rb");      // open fil
 
+    bzero(dataBuffer,sizeof(dataBuffer));  // set buffer til 0
     numberOfBytes = fread(dataBuffer,1,dataToSend,fp);
 
     // Send filen
