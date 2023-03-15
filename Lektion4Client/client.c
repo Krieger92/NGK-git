@@ -44,7 +44,7 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
             printf("Number of bytes: %i\n" , numberOfBytes);
             dataToRead -= numberOfBytes;
         }
-        else
+        else if(dataToRead >= 1000)
         {
             numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
             fwrite(buffer,1,numberOfBytes,fp);
