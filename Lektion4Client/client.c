@@ -39,12 +39,14 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
         if(dataToRead < 1000) {
             numberOfBytes = read(serverSocket,buffer,sizeof(buffer));
             numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
+            printf("Debug data print: %s \n", buffer);
             dataToRead -= numberOfBytes;
         }
         else
         {
             numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
             numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
+            printf("Debug data print: %s \n", buffer);
             dataToRead -= numberOfBytes;
         }
 
