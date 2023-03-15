@@ -35,7 +35,7 @@ void sendFile(const int clientSocket, const char* fileName, long fileSize)
 
     fp = fopen(fileName,"rb");      // open fil
 
-
+    bzero(dataBuffer,sizeof(dataBuffer));                       // nulstil buffer
     numberOfBytes = fread(dataBuffer,1,sizeof(dataBuffer),fp);  // start læsning af fil
 
     while (numberOfBytes) {                                     // imens der stadig er mere at læse
