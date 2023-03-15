@@ -35,15 +35,15 @@ void sendFile(const int clientSocket, const char* fileName, long fileSize)
 
     fp = fopen(fileName,"rb");      // open fil
 
-    do 
-    {                                                                  // imens der stadig er mere at læse
-        bzero(dataBuffer,sizeof(dataBuffer));                        // hvis der er mindre end 1000 bytes tilbage
-        numberOfBytes = fread(dataBuffer,1,dataToSend,fp);          // læs resten af filen
-        numberOfBytes = write(clientSocket,dataBuffer,numberOfBytes);                   // skriv op til 1000 bytes til bruger
-        printf("Debug data print: %s \n", dataBuffer);
-        dataToSend -= numberOfBytes;                                    // opdater antal bytes der mangler at blive sendt
-    } while (numberOfBytes);
+    numberOfBytes = fread(dataBuffer,1,dataToSend,fp);
 
+    // Send filen
+    while(numberOfBytes > 0) {
+        write(clientSocket,dataBuffer,numberOfBytes);
+        dataToSend -= numberOfBytes;
+        numberOfBytes = fread(dataBuffer,1,dataToSend,fp);
+    }
+    
     printf("Data: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
 
     fclose(fp);
