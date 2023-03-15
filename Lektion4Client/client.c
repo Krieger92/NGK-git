@@ -36,7 +36,7 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
 
         bzero(buffer,sizeof(buffer));
 
-        if(dataToRead < 1000) {
+        if(dataToRead < 1000 && dataToRead > 0) {
             numberOfBytes = read(serverSocket,buffer,dataToRead);
             fwrite(buffer,1,numberOfBytes,fp);
             printf("Debug data print small file: %s \n", buffer);
