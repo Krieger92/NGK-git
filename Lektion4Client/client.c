@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #include "iknlib.h"
 
 // @brief Funktion til at udskrive fejlbeskeder til terminal
@@ -20,44 +20,32 @@ void error(const char * msg) {
  // @param serverSocket socket stream til server
  // @param fileName filnavn, muligvis med sti
  // @param fileSize størelse af fil
-void receiveFile(int serverSocket, const char* fileName, long fileSize)
+void receiveFile(int serverSocket, const char* fileName, const long fileSize)
 {
-    FILE * fp;
-    uint8_t buffer[1000];
-    int dataToRead = fileSize;
-    int numberOfBytes;
+    FILE * fp;                      // fil pointer
+    uint8_t buffer[1000];           // buffer til data fra server
+    long dataToRead = fileSize;     // hvor meget mangler (kun til terminal print)
+    size_t numberOfBytesRead;       // antal bytes læst fra server socket
+    size_t numberOfBytesWritten;    // antal bytes skrevet til fil
 
+    // print hvilken fil og størelse
 	printf("Receiving: '%s', size: %li\n", fileName, fileSize);
 
-    fp = fopen(fileName,"wb");
+    fp = fopen(fileName,"wb");                                      // åben fil
 
     do {
-        printf("Data: %li / %li\n",(fileSize-dataToRead), fileSize);
+        printf("Data: %li / %li\n",(fileSize - dataToRead), fileSize);              // opdater terminal
+        bzero(buffer,sizeof(buffer));                                               // nulstil buffer
+        numberOfBytesRead = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);   // indlæs ny data i buffer
+        numberOfBytesWritten = fwrite(buffer,1,numberOfBytesRead,fp);               // skriv buffer ned i fil
+        if(numberOfBytesRead != numberOfBytesWritten)                               // error handle
+            error("ERROR - Bytes read and written does not match!");
 
-        bzero(buffer,sizeof(buffer));
+        dataToRead -= numberOfBytesWritten;                                         // opdater dataToRead
 
-        if(dataToRead < 1000) {
+    } while(numberOfBytesRead);
 
-            numberOfBytes = read(serverSocket,buffer,sizeof(buffer));
-            numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
-            printf("Debug data print small file: %s \n", buffer);
-            printf("Data to read: %i\n" , dataToRead);
-            printf("Number of bytes: %i\n" , numberOfBytes);
-            dataToRead -= numberOfBytes;
-        }
-        else
-        {
-            numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
-            numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
-            printf("Debug data print: %s \n", buffer);
-            printf("Data to read: %i\n" , dataToRead);
-            printf("Number of bytes: %i\n" , numberOfBytes);
-            dataToRead -= numberOfBytes;
-        }
-
-    } while(numberOfBytes);
-
-    fclose(fp);
+    fclose(fp);     // gem og luk fil
     
 }
 
@@ -93,11 +81,11 @@ int main(int argc, char* argv[]) {
         error("ERROR connecting");
     }
 
-    writeTextTCP(sockfd,argv[2]);                       // anmod om fil
-    readTextTCP(sockfd,charBuffer,sizeof(charBuffer));  // læs filstørelse
-    printf("File size: %s\n",charBuffer);
-    int fileSize = atoi(charBuffer);                    // gem som integer
-    receiveFile(sockfd,argv[2],fileSize);               // download fil
+    writeTextTCP(sockfd,argv[2]);                            // anmod om fil
+    recv(sockfd,charBuffer,sizeof(charBuffer),MSG_WAITALL);  // læs filstørelse (HELE BUFFER)
+    int fileSize = atoi(charBuffer);                         // gem som integer
+    receiveFile(sockfd,argv[2],fileSize);                    // download fil
 
+    close(sockfd);
     return 0;
 }
