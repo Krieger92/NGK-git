@@ -23,7 +23,7 @@ void error(const char * msg) {
 void sendFile(const int clientSocket, const char* fileName, long fileSize)
 {
     FILE * fp;                      // pointer til fil 
-    size_t numberOfBytes;      // retur parameter for fread (antal bytes læst)
+    size_t numberOfBytes = 0;      // retur parameter for fread (antal bytes læst)
     uint8_t dataBuffer[1000];       // buffer med plads til 1000 bytes  
     char charBuffer[256];
     long dataToSend = fileSize;     // Antal bytes der mangler at blive sendt
@@ -35,14 +35,13 @@ void sendFile(const int clientSocket, const char* fileName, long fileSize)
 
     fp = fopen(fileName,"rb");      // open fil
 
-    while (numberOfBytes) {                                     // imens der stadig er mere at læse
-
-
+    do 
+    {                                     // imens der stadig er mere at læse
         bzero(dataBuffer,sizeof(dataBuffer));                        // hvis der er mindre end 1000 bytes tilbage
         numberOfBytes = fread(dataBuffer,1,dataToSend,fp);          // læs resten af filen
         write(clientSocket,dataBuffer,numberOfBytes);                   // skriv op til 1000 bytes til bruger
         dataToSend -= numberOfBytes;                                    // opdater antal bytes der mangler at blive sendt
-    } 
+    } while (numberOfBytes);
 
     printf("Data: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
 
