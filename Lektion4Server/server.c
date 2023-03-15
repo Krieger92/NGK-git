@@ -2,8 +2,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include "iknlib.h"
 
@@ -20,32 +20,31 @@ void error(const char * msg) {
 // @param clientSocket Clientens socket (newsocketfd)
 // @param fileName Navn på filen der ønskes sendt
 // @param fileSize Størelsen på filen der ønskes sendt
-void sendFile(const int clientSocket, const char* fileName, long fileSize)
+void sendFile(const int clientSocket, const char* fileName, const long fileSize)
 {
     FILE * fp;                      // pointer til fil 
-    size_t numberOfBytes = 0;      // retur parameter for fread (antal bytes læst)
+    size_t numberOfBytes;      // retur parameter for fread (antal bytes læst)
     uint8_t dataBuffer[1000];       // buffer med plads til 1000 bytes  
     char charBuffer[256];
-    long dataToSend = fileSize;     // Antal bytes der mangler at blive sendt
+    long dataSendt = 0;     // Antal bytes der mangler at blive sendt
 
 	printf("Sending: %s, size: %li\n", fileName, fileSize);     // opdater terminal
     
+    bzero(charBuffer,sizeof(charBuffer));
     snprintf(charBuffer,sizeof(charBuffer),"%li",fileSize);
     write(clientSocket,charBuffer,sizeof(charBuffer));
 
     fp = fopen(fileName,"rb");      // open fil
 
-    bzero(dataBuffer,sizeof(dataBuffer));  // set buffer til 0
-    numberOfBytes = fread(dataBuffer,1,dataToSend,fp);
-
-    // Send filen
-    while(numberOfBytes > 0) {
-        write(clientSocket,dataBuffer,numberOfBytes);
-        dataToSend -= numberOfBytes;
-        numberOfBytes = fread(dataBuffer,1,dataToSend,fp);
-    }
+    printf("Data: %li / %li\n",(dataSendt), fileSize);          // opdater terminal
+    do{     // imens der stadig er mere at læse
+        bzero(dataBuffer,sizeof(dataBuffer));
+        numberOfBytes = fread(dataBuffer,1,sizeof(dataBuffer),fp);                // aflæs op til 1000 bytes fra fil
+        write(clientSocket,dataBuffer,numberOfBytes);               // skriv op til 1000 bytes til bruger
+        dataSendt += numberOfBytes;                                 // opdater antal bytes der mangler at blive sendt
+        printf("Data: %li / %li\n",(dataSendt), fileSize);          // opdater terminal
     
-    printf("Data: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
+    }while(numberOfBytes);
 
     fclose(fp);
 	
@@ -61,7 +60,7 @@ int main(int argc, char* argv[]) {
     int clilen;         // client addresse
     int n;              // retur parameter for read() og write()
 
-    uint8_t buffer[SIZE];  // buffer 
+    char buffer[SIZE];  // buffer 
 
                                     // struct fra <netinet/in.h>
     struct sockaddr_in serv_addr;   // server adresse/forbindelse info
