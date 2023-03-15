@@ -36,15 +36,17 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
 
         bzero(buffer,sizeof(buffer));
 
-        if(dataToRead < 1000 && dataToRead > 0) {
-            numberOfBytes = read(serverSocket,buffer,dataToRead);
+        if(dataToRead < 1000) {
+
+            numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_DONTWAIT);
+            numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
             fwrite(buffer,1,numberOfBytes,fp);
             printf("Debug data print small file: %s \n", buffer);
             printf("Data to read: %i\n" , dataToRead);
             printf("Number of bytes: %i\n" , numberOfBytes);
             dataToRead -= numberOfBytes;
         }
-        else if(dataToRead >= 1000)
+        else
         {
             numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
             fwrite(buffer,1,numberOfBytes,fp);
@@ -54,7 +56,7 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
             dataToRead -= numberOfBytes;
         }
 
-    } while(dataToRead);
+    } while(numberOfBytes);
 
     fclose(fp);
     
