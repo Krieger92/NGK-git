@@ -34,15 +34,18 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
     do {
         printf("Data: %li / %li\n",(fileSize-dataToRead), fileSize);
 
-        numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
-        dataToRead -= numberOfBytes;
-        numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
+        bzero(buffer,sizeof(buffer));
 
         if(dataToRead < 1000) {
-            bzero(buffer,sizeof(buffer));
             numberOfBytes = read(serverSocket,buffer,sizeof(buffer));
             numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
             dataToRead -= numberOfBytes;
+        }
+        else
+        {
+            numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
+            dataToRead -= numberOfBytes;
+            numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
         }
 
     } while(numberOfBytes);
