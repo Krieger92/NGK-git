@@ -44,8 +44,8 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
         else
         {
             numberOfBytes = recv(serverSocket,buffer,sizeof(buffer),MSG_WAITALL);
-            dataToRead -= numberOfBytes;
             numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
+            dataToRead -= numberOfBytes;
         }
 
     } while(numberOfBytes);
