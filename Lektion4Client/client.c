@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) {
 
     writeTextTCP(sockfd,argv[2]);                       // anmod om fil
     readTextTCP(sockfd,charBuffer,sizeof(charBuffer));  // læs filstørelse
+    printf("File size: %s\n",charBuffer);
     int fileSize = atoi(charBuffer);                    // gem som integer
     receiveFile(sockfd,argv[2],fileSize);               // download fil
 
