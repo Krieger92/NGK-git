@@ -54,7 +54,7 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
             dataToRead -= numberOfBytes;
         }
 
-    } while(numberOfBytes);
+    } while(dataToRead);
 
     fclose(fp);
     
