@@ -25,7 +25,7 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
     FILE * fp;
     uint8_t buffer[1000];
     int dataToRead = fileSize;
-    unsigned long numberOfBytes;
+    int numberOfBytes;
 
 	printf("Receiving: '%s', size: %li\n", fileName, fileSize);
 
@@ -35,10 +35,9 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
         printf("Data: %li / %li\n",(fileSize-dataToRead), fileSize);
 
         bzero(buffer,sizeof(buffer));
-        printf("Size of buffer: %i" , sizeof(buffer));
 
         if(dataToRead < 1000) {
-            numberOfBytes = read(serverSocket,buffer,sizeof(buffer));
+            numberOfBytes = read(serverSocket,buffer,dataToRead);
             fwrite(buffer,1,numberOfBytes,fp);
             printf("Debug data print small file: %s \n", buffer);
             printf("Data to read: %i\n" , dataToRead);
