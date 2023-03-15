@@ -40,6 +40,7 @@ void sendFile(const int clientSocket, const char* fileName, long fileSize)
         bzero(dataBuffer,sizeof(dataBuffer));                        // hvis der er mindre end 1000 bytes tilbage
         numberOfBytes = fread(dataBuffer,1,dataToSend,fp);          // læs resten af filen
         write(clientSocket,dataBuffer,numberOfBytes);                   // skriv op til 1000 bytes til bruger
+        printf("Debug data print: %s \n", dataBuffer);
         dataToSend -= numberOfBytes;                                    // opdater antal bytes der mangler at blive sendt
     } while (numberOfBytes);
 
