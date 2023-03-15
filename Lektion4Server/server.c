@@ -38,7 +38,7 @@ void sendFile(const int clientSocket, const char* fileName, long fileSize)
     numberOfBytes = fread(dataBuffer,1,sizeof(dataBuffer),fp);  // start læsning af fil
 
     while (numberOfBytes) {                                     // imens der stadig er mere at læse
-        bzero(dataBuffer,sizeof(dataBuffer));
+
         printf("Data: %li / %li\n",(fileSize-dataToSend), fileSize);   // opdater terminal
         
         write(clientSocket,dataBuffer,numberOfBytes);                   // skriv op til 1000 bytes til bruger
