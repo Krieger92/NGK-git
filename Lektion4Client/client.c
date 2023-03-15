@@ -39,6 +39,7 @@ void receiveFile(int serverSocket, const char* fileName, long fileSize)
         numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
 
         if(dataToRead < 1000) {
+            bzero(buffer,sizeof(buffer));
             numberOfBytes = read(serverSocket,buffer,sizeof(buffer));
             numberOfBytes = fwrite(buffer,1,numberOfBytes,fp);
             dataToRead -= numberOfBytes;
